@@ -3,11 +3,12 @@
 
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { AuthLayout } from './layouts/auth-layout-component';
+import classes from './app.module.scss';
 import './common/i18n';
 
 export function App() {
   return (
-    <div>
+    <div className={classes.aplication_wrapper}>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<AuthLayout />} />
