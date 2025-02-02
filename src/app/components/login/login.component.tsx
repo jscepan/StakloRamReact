@@ -1,7 +1,9 @@
 import { JSX } from 'react';
 import classes from './login.component.module.scss';
+import { useTranslation } from 'react-i18next';
 
 export const Login: React.FC = (): JSX.Element => {
+  const { t } = useTranslation();
   const performLogin = (event: any) => {
     event.preventDefault();
     console.log(event);
@@ -10,13 +12,13 @@ export const Login: React.FC = (): JSX.Element => {
   return (
     <div className={classes.loginSection}>
       <form className={classes.loginForm} onSubmit={performLogin}>
-        <label htmlFor="username">username</label>
+        <label htmlFor="username">{t('username')}</label>
         <input id="username" name="username" required />
-        <label htmlFor="password">password</label>
+        <label htmlFor="password">{t('password')}</label>
         <input id="password" name="password" type="password" required />
 
         <button className="login-button" type="submit">
-          login
+          {t('login')}
         </button>
       </form>
     </div>

@@ -3,6 +3,7 @@
 
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { AuthLayout } from './layouts/auth-layout-component';
+import './common/i18n';
 
 export function App() {
   return (
