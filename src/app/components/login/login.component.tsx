@@ -1,26 +1,21 @@
 import { JSX } from 'react';
 import classes from './login.component.module.scss';
-import { useTranslation } from 'react-i18next';
+import { AuthRequestModel } from 'src/app/models/auth-request.model';
+import { LoginForm } from '../login-form.component';
+import { AuthenticationService } from '../../services/authenthication.service';
 
 export const Login: React.FC = (): JSX.Element => {
-  const { t } = useTranslation();
-  const performLogin = (event: any) => {
-    event.preventDefault();
-    console.log(event);
+  const loginHandler = (data: AuthRequestModel): void => {
+    //
+    console.log(data);
+    AuthenticationService.login(data).then((res) => {
+      console.log(res);
+    });
   };
 
   return (
     <div className={classes.loginSection}>
-      <form className={classes.loginForm} onSubmit={performLogin}>
-        <label htmlFor="username">{t('username')}</label>
-        <input id="username" name="username" required />
-        <label htmlFor="password">{t('password')}</label>
-        <input id="password" name="password" type="password" required />
-
-        <button className="login-button" type="submit">
-          {t('login')}
-        </button>
-      </form>
+      <LoginForm setLoginInfo={loginHandler} />
     </div>
   );
 };
