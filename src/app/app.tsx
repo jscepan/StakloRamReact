@@ -1,11 +1,17 @@
 // Uncomment this line to use CSS modules
 // import styles from './app.module.scss';
-import NxWelcome from './nx-welcome';
+
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { AuthLayout } from './layouts/auth-layout-component';
 
 export function App() {
   return (
     <div>
-      <NxWelcome title="stakloram-react" />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<AuthLayout />} />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }
