@@ -1,10 +1,7 @@
-// import { environment } from 'src/environments/environment';
-
 import { EnumValueModel } from '../models/enum.model';
 
 // BASE_API_URL should have value 'http://localhost:8081' in DEVELOPMENT MODE, otherwise empty string ''
-export const BASE_API_URL = '';
-// export const BASE_API_URL: string = environment.baseApiUrl;
+export const BASE_API_URL = import.meta.env.DEV ? 'http://localhost:8081' : '';
 
 export const DOMAIN_BUYERS = 'buyers';
 export const DOMAIN_COUNTRIES = 'countries';
