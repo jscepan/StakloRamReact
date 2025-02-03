@@ -1,15 +1,16 @@
 import { BASE_API_URL } from '../common/constants';
 import { AuthRequestModel } from '../models/auth-request.model';
 import { AuthModel } from '../models/auth.model';
+import { ResponseI } from '../models/response.models';
 import { UserModel } from '../models/user.model';
 import { HttpService } from './http.service';
 
 export const AuthenticationService = {
-  login: (data: AuthRequestModel): Promise<AuthModel> => {
+  login: (data: AuthRequestModel): Promise<ResponseI<AuthModel>> => {
     return HttpService.post(`${BASE_API_URL}/auth/login`, data);
   },
 
-  getCurrentUser: (data: AuthRequestModel): Promise<UserModel> => {
+  getCurrentUser: (data: AuthRequestModel): Promise<ResponseI<UserModel>> => {
     return HttpService.post(`${BASE_API_URL}/auth/login`, data);
   },
 
@@ -17,7 +18,7 @@ export const AuthenticationService = {
     username: string;
     oldPassword: string;
     newPassword: string;
-  }): Promise<{ jwt: string }> => {
+  }): Promise<ResponseI<{ jwt: string }>> => {
     return HttpService.post(`${BASE_API_URL}/auth/password-change`, data);
   },
 };
