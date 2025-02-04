@@ -1,6 +1,6 @@
 import { JSX } from 'react';
 import classes from './login.component.module.scss';
-import { LoginForm } from '../login-form.component';
+import { LoginForm } from './login-form.component';
 import { AuthRequestModel } from 'src/models/auth-request.model';
 import { AuthenticationService, LocalStorageService } from 'src/services';
 import { useNavigate } from 'react-router-dom';
