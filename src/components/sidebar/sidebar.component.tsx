@@ -16,13 +16,9 @@ import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 
 export interface SidebarNavItemI {
-  id: string;
-  title: string;
-  icon: string;
-  isFav?: boolean;
-  activated: boolean;
-  hidden?: boolean;
-  disabled?: boolean;
+  to: string;
+  icon: any;
+  label: string;
 }
 
 export interface SidebarI {
@@ -33,87 +29,69 @@ export const Sidebar: React.FC<Partial<SidebarI>> = ({}): JSX.Element => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState<boolean>(true);
 
+  const navItems: SidebarNavItemI[] = [
+    {
+      to: '/dashboard',
+      icon: <HomeOutlined className={classes.icon} />,
+      label: 'dashboard',
+    },
+    {
+      to: '/invoices',
+      icon: <CreditCardOutlined className={classes.icon} />,
+      label: 'invoices',
+    },
+    {
+      to: '/work-orders',
+      icon: <TruckOutlined className={classes.icon} />,
+      label: 'workOrder',
+    },
+    {
+      to: '/incomes',
+      icon: <DollarOutlined className={classes.icon} />,
+      label: 'incomes',
+    },
+    {
+      to: '/views',
+      icon: <EyeOutlined className={classes.icon} />,
+      label: 'views',
+    },
+    {
+      to: '/users',
+      icon: <UserOutlined className={classes.icon} />,
+      label: 'users',
+    },
+    {
+      to: '/settings',
+      icon: <SettingOutlined className={classes.icon} />,
+      label: 'settings',
+    },
+  ];
+
   return (
     <div>
       <div
-        className={`${classes.navItemsContainer}  ${
+        className={`${classes.navItemsContainer} ${
           loading ? classes.loading : ''
         }`}
       >
-        <NavLink
-          to="/dashboard"
-          className={({ isActive }) =>
-            isActive ? `${classes.navItem} ${classes.active}` : classes.navItem
-          }
-        >
-          <HomeOutlined className={classes.icon} />
-          {!loading && (
-            <div className={classes.placeholder}>{t('dashboard')}</div>
-          )}
-        </NavLink>
-        <NavLink
-          to="/invoices"
-          className={({ isActive }) =>
-            isActive ? `${classes.navItem} ${classes.active}` : classes.navItem
-          }
-        >
-          <CreditCardOutlined className={classes.icon} />
-          {!loading && (
-            <div className={classes.placeholder}>{t('invoices')}</div>
-          )}
-        </NavLink>
-        <NavLink
-          to="/work-orders"
-          className={({ isActive }) =>
-            isActive ? `${classes.navItem} ${classes.active}` : classes.navItem
-          }
-        >
-          <TruckOutlined className={classes.icon} />
-          {!loading && (
-            <div className={classes.placeholder}>{t('workOrder')}</div>
-          )}
-        </NavLink>
-        <NavLink
-          to="/incomes"
-          className={({ isActive }) =>
-            isActive ? `${classes.navItem} ${classes.active}` : classes.navItem
-          }
-        >
-          <DollarOutlined className={classes.icon} />
-          {!loading && (
-            <div className={classes.placeholder}>{t('incomes')}</div>
-          )}
-        </NavLink>
-        <NavLink
-          to="/views"
-          className={({ isActive }) =>
-            isActive ? `${classes.navItem} ${classes.active}` : classes.navItem
-          }
-        >
-          <EyeOutlined className={classes.icon} />
-          {!loading && <div className={classes.placeholder}>{t('views')}</div>}
-        </NavLink>
-        <NavLink
-          to="/users"
-          className={({ isActive }) =>
-            isActive ? `${classes.navItem} ${classes.active}` : classes.navItem
-          }
-        >
-          <UserOutlined className={classes.icon} />
-          {!loading && <div className={classes.placeholder}>{t('users')}</div>}
-        </NavLink>
-        <NavLink
-          to="/settings"
-          className={({ isActive }) =>
-            isActive ? `${classes.navItem} ${classes.active}` : classes.navItem
-          }
-        >
-          <SettingOutlined className={classes.icon} />
-          {!loading && (
-            <div className={classes.placeholder}>{t('settings')}</div>
-          )}
-        </NavLink>
+        {navItems.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            className={({ isActive }) =>
+              isActive
+                ? `${classes.navItem} ${classes.active}`
+                : classes.navItem
+            }
+          >
+            {item.icon}
+            {!loading && (
+              <div className={classes.placeholder}>{t(item.label)}</div>
+            )}
+          </NavLink>
+        ))}
       </div>
+
       <div className={classes.expandButton}>
         <div className={classes.wrapper}>
           {!loading && (
