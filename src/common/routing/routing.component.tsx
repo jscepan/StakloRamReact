@@ -1,10 +1,4 @@
-import React, {
-  JSX,
-  PropsWithChildren,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import React, { JSX, useContext, useEffect, useState } from 'react';
 import {
   BrowserRouter,
   Routes,
@@ -18,7 +12,6 @@ import { Dashboard } from 'src/pages/dashboard/dashboard.component';
 import { AuthContext } from '../providers/auth-context.provider';
 import { UserModel } from 'src/models/user.model';
 import { UserService } from 'src/services/user.service';
-import { IncomeCreateEdit } from 'src/pages/income-create-edit/income-create-edit.component';
 import { Invoices } from 'src/pages/invoices/invoices.component';
 import { Incomes } from 'src/pages/incomes/incomes.component';
 import { Outcomes } from 'src/pages/outcomes/outcomes.component';

@@ -1,6 +1,16 @@
 import React, { JSX, useState } from 'react';
 import classes from './sidebar.component.module.scss';
-import { HomeOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
+import {
+  CreditCardOutlined,
+  DollarOutlined,
+  EyeOutlined,
+  HomeOutlined,
+  LeftOutlined,
+  RightOutlined,
+  SettingOutlined,
+  TruckOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
 import { Button } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
@@ -21,45 +31,99 @@ export interface SidebarI {
 
 export const Sidebar: React.FC<Partial<SidebarI>> = ({}): JSX.Element => {
   const { t } = useTranslation();
-  const [isExpanded, toggleIsExpanded] = useState(true);
-  const [navItems, setNavItems] = useState(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   return (
     <div>
-      <div>
-        <NavLink to="/dashboard" className={classes.navItem}>
+      <div
+        className={`${classes.navItemsContainer}  ${
+          loading ? classes.loading : ''
+        }`}
+      >
+        <NavLink
+          to="/dashboard"
+          className={({ isActive }) =>
+            isActive ? `${classes.navItem} ${classes.active}` : classes.navItem
+          }
+        >
           <HomeOutlined className={classes.icon} />
-          <div className={classes.placeholder}>{t('dashboard')}</div>
+          {!loading && (
+            <div className={classes.placeholder}>{t('dashboard')}</div>
+          )}
         </NavLink>
-        <NavLink to="/invoices" className={classes.navItem}>
-          <HomeOutlined className={classes.icon} />
-          <div className={classes.placeholder}>{t('invoices')}</div>
+        <NavLink
+          to="/invoices"
+          className={({ isActive }) =>
+            isActive ? `${classes.navItem} ${classes.active}` : classes.navItem
+          }
+        >
+          <CreditCardOutlined className={classes.icon} />
+          {!loading && (
+            <div className={classes.placeholder}>{t('invoices')}</div>
+          )}
         </NavLink>
-        <NavLink to="/work-orders" className={classes.navItem}>
-          <HomeOutlined className={classes.icon} />
-          <div className={classes.placeholder}>{t('workOrder')}</div>
+        <NavLink
+          to="/work-orders"
+          className={({ isActive }) =>
+            isActive ? `${classes.navItem} ${classes.active}` : classes.navItem
+          }
+        >
+          <TruckOutlined className={classes.icon} />
+          {!loading && (
+            <div className={classes.placeholder}>{t('workOrder')}</div>
+          )}
         </NavLink>
-        <NavLink to="/incomes" className={classes.navItem}>
-          <HomeOutlined className={classes.icon} />
-          <div className={classes.placeholder}>{t('incomes')}</div>
+        <NavLink
+          to="/incomes"
+          className={({ isActive }) =>
+            isActive ? `${classes.navItem} ${classes.active}` : classes.navItem
+          }
+        >
+          <DollarOutlined className={classes.icon} />
+          {!loading && (
+            <div className={classes.placeholder}>{t('incomes')}</div>
+          )}
         </NavLink>
-        <NavLink to="/views" className={classes.navItem}>
-          <HomeOutlined className={classes.icon} />
-          <div className={classes.placeholder}>{t('views')}</div>
+        <NavLink
+          to="/views"
+          className={({ isActive }) =>
+            isActive ? `${classes.navItem} ${classes.active}` : classes.navItem
+          }
+        >
+          <EyeOutlined className={classes.icon} />
+          {!loading && <div className={classes.placeholder}>{t('views')}</div>}
         </NavLink>
-        <NavLink to="/users" className={classes.navItem}>
-          <HomeOutlined className={classes.icon} />
-          <div className={classes.placeholder}>{t('users')}</div>
+        <NavLink
+          to="/users"
+          className={({ isActive }) =>
+            isActive ? `${classes.navItem} ${classes.active}` : classes.navItem
+          }
+        >
+          <UserOutlined className={classes.icon} />
+          {!loading && <div className={classes.placeholder}>{t('users')}</div>}
         </NavLink>
-        <NavLink to="/settings" className={classes.navItem}>
-          <HomeOutlined className={classes.icon} />
-          <div className={classes.placeholder}>{t('settings')}</div>
+        <NavLink
+          to="/settings"
+          className={({ isActive }) =>
+            isActive ? `${classes.navItem} ${classes.active}` : classes.navItem
+          }
+        >
+          <SettingOutlined className={classes.icon} />
+          {!loading && (
+            <div className={classes.placeholder}>{t('settings')}</div>
+          )}
         </NavLink>
       </div>
       <div className={classes.expandButton}>
         <div className={classes.wrapper}>
-          {!isExpanded && <Button icon={<LeftOutlined />} />}
-          {isExpanded && <Button icon={<RightOutlined />} />}
+          {!loading && (
+            <Button icon={<LeftOutlined onClick={() => setLoading(true)} />} />
+          )}
+          {loading && (
+            <Button
+              icon={<RightOutlined onClick={() => setLoading(false)} />}
+            />
+          )}
         </div>
       </div>
     </div>
