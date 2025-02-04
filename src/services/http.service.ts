@@ -1,6 +1,7 @@
 import axios, { AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
 import { ErrorResponseI } from '../models/error-response.interface';
 import { ResponseI } from '../models/response.models';
+import { LocalStorageService } from './local-storage.service';
 
 export const ax = axios.create();
 
@@ -10,7 +11,7 @@ ax.interceptors.request.use(
     if (config.url?.includes('/auth/login')) {
       //   config.withCredentials = true;
     } else {
-      //
+      config.headers.Authorization = LocalStorageService.get('jwt');
     }
     return config;
   },
