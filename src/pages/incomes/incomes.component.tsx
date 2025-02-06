@@ -1,10 +1,9 @@
-import React, { JSX, useState } from 'react';
+import React, { JSX, useRef } from 'react';
 import classes from './incomes.component.module.scss';
 import {
   Button,
   DatePicker,
   Dropdown,
-  Input,
   MenuProps,
   Space,
   Table,
@@ -17,6 +16,7 @@ import { IncomeModel } from 'src/models/income.model';
 import { DownOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { SearchInput } from 'src/components/shared/search-input/search-input.component';
+import { useInfiniteScroll } from 'src/common/hooks/infinite-scroll.hook';
 
 interface InvoiceTableDataType {
   key: string;
@@ -45,7 +45,8 @@ export const Incomes: React.FC = (): JSX.Element => {
   const {
     data: incomes,
     setSorting,
-    setSearch,
+    setQuickSearch,
+    requestNextPage,
   } = useListManager(IncomeService.searchEntities, transformEntity);
 
   const columns: TableProps<InvoiceTableDataType>['columns'] = [
@@ -103,13 +104,17 @@ export const Incomes: React.FC = (): JSX.Element => {
     setSorting(key);
   };
 
+  const containerRef = useInfiniteScroll(requestNextPage);
+  const searchInputRef = useRef<{ clearSearch: () => void } | null>(null);
+
   return (
     <div className={classes.container}>
       <div className={classes.filter}>
         <Space.Compact>
           <SearchInput
+            ref={searchInputRef}
             placeholder={t('searchFor')}
-            onSearch={(value) => setSearch(value)}
+            onSearch={(value) => setQuickSearch(value)}
           />
         </Space.Compact>
         <DatePicker placeholder={t('fromDate')} />
@@ -128,12 +133,15 @@ export const Incomes: React.FC = (): JSX.Element => {
         </Button>
         <Button onClick={incomeCreateEditPopup}>{t('createIncome')}</Button>
       </div>
-      <Table<InvoiceTableDataType>
-        columns={columns}
-        dataSource={incomes}
-        pagination={false}
-        scroll={{ y: 'max-content' }}
-      />
+      <div className={classes.incomes} ref={containerRef}>
+        <Table<InvoiceTableDataType>
+          className={classes.incomesTable}
+          columns={columns}
+          dataSource={incomes}
+          pagination={false}
+          sticky={{ offsetHeader: 0 }}
+        />
+      </div>
     </div>
   );
 };

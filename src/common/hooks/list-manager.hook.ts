@@ -21,7 +21,7 @@ interface ListManagerReturn<T, C> {
   requestFirstPage: () => void;
   requestNextPage: () => void;
   setSorting: (ordering: string) => void;
-  setSearch: (criteriaQuick: string) => void;
+  setQuickSearch: (criteriaQuick: string) => void;
   clearFilters: () => void;
   addBetweenAttribute: (newBetweenAttribute: BettweenAttribute) => void;
   removeBetweenAttribute: (attr: string) => void;
@@ -51,17 +51,29 @@ export function useListManager<T extends BaseModel, C extends BaseModel>(
   };
 
   const setSorting = (sort: string) => {
+    setEntities([]);
+    setData([]);
     setSearchModel((prev) => ({ ...prev, ordering: sort }));
   };
-  const setSearch = useCallback((criteriaQuick: string) => {
-    setSearchModel((prev) => {
-      if (prev.criteriaQuick === criteriaQuick) {
-        console.log('xxx');
-        return prev;
-      }
-      return { ...prev, criteriaQuick };
-    });
-  }, []);
+
+  const setQuickSearch = (criteriaQuick: string) => {
+    console.log(criteriaQuick);
+  };
+  //   const setSearch = useCallback(
+  //     (criteriaQuick: string) => {
+  //       setEntities([]);
+  //       setData([]);
+  //       setSearchModel((prev) => {
+  //         console.log('1');
+  //         if (prev.criteriaQuick === criteriaQuick) {
+  //           console.log('xxx');
+  //           return prev;
+  //         }
+  //         return { ...prev, criteriaQuick };
+  //       });
+  //     },
+  //     [setSearchModel]
+  //   );
   const clearFilters = () => {
     setSearchModel(new SearchModel());
     setEntities([]);
@@ -108,7 +120,7 @@ export function useListManager<T extends BaseModel, C extends BaseModel>(
     requestFirstPage,
     requestNextPage,
     setSorting,
-    setSearch,
+    setQuickSearch,
     clearFilters,
     addBetweenAttribute,
     removeBetweenAttribute,
