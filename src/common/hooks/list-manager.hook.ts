@@ -107,8 +107,9 @@ export function useListManager<T extends BaseModel, C extends BaseModel>(
         return res.data;
       })
       .then((data) => {
-        setEntities(data.entities);
-        setData(data.entities.map(transformFunction));
+        setEntities((prev) => [...prev, ...data.entities]);
+        setData((prev) => [...prev, ...data.entities.map(transformFunction)]);
+        // data.entities.map(transformFunction));
       })
       .finally(() => setLoading(false));
   }, [requestFunction, transformFunction, skip, top, searchModel]);

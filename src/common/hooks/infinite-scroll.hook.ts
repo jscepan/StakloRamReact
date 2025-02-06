@@ -1,17 +1,26 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-export const useInfiniteScroll = (bottomReachedFn: () => void) => {
+export const useInfiniteScroll = (
+  bottomReachedFn: () => void,
+  isLoading: boolean
+) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const [hasReachedBottom, setHasReachedBottom] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (!containerRef.current) {
+      if (!containerRef.current || isLoading) {
         return;
       }
       const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
+      const isBottom = scrollTop + clientHeight >= scrollHeight - 10;
 
-      if (scrollTop + clientHeight >= scrollHeight - 10) {
-        // bottomReachedFn();
+      if (isBottom && !hasReachedBottom) {
+        console.log('udario dno');
+        setHasReachedBottom(true);
+        bottomReachedFn();
+      } else if (!isBottom) {
+        setHasReachedBottom(false);
       }
     };
 
@@ -25,7 +34,7 @@ export const useInfiniteScroll = (bottomReachedFn: () => void) => {
         container.removeEventListener('scroll', handleScroll);
       }
     };
-  }, [bottomReachedFn]);
+  }, [bottomReachedFn, isLoading]);
 
   return containerRef;
 };

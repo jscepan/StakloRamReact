@@ -44,6 +44,7 @@ export const Incomes: React.FC = (): JSX.Element => {
 
   const {
     data: incomes,
+    loading,
     setSorting,
     setQuickSearch,
     requestNextPage,
@@ -104,7 +105,7 @@ export const Incomes: React.FC = (): JSX.Element => {
     setSorting(key);
   };
 
-  const containerRef = useInfiniteScroll(requestNextPage);
+  const containerRef = useInfiniteScroll(requestNextPage, loading);
   const searchInputRef = useRef<{ clearSearch: () => void } | null>(null);
 
   return (
