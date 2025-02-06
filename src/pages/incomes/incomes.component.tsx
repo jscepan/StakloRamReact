@@ -1,4 +1,4 @@
-import React, { JSX, useMemo, useState } from 'react';
+import React, { JSX, useState } from 'react';
 import classes from './incomes.component.module.scss';
 import {
   Button,
@@ -14,9 +14,9 @@ import { useTranslation } from 'react-i18next';
 import { IncomeService } from 'src/services/income.service';
 import { useListManager } from 'src/common/hooks/list-manager.hook';
 import { IncomeModel } from 'src/models/income.model';
-import { SearchModel } from 'src/models/search.model';
 import { DownOutlined } from '@ant-design/icons';
-import { Navigate, NavLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { SearchInput } from 'src/components/shared/search-input/search-input.component';
 
 interface InvoiceTableDataType {
   key: string;
@@ -38,50 +38,15 @@ const transformEntity = (entity: IncomeModel): InvoiceTableDataType => ({
   comment: entity.comment,
 });
 
-const items: MenuProps['items'] = [
-  {
-    label: (
-      <a
-        href="https://www.antgroup.com"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        1st menu item
-      </a>
-    ),
-    key: '0',
-  },
-  {
-    label: (
-      <a
-        href="https://www.aliyun.com"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        2nd menu item
-      </a>
-    ),
-    key: '1',
-  },
-  {
-    type: 'divider',
-  },
-  {
-    label: '3rd menu item',
-    key: '3',
-  },
-];
-
 export const Incomes: React.FC = (): JSX.Element => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const searchParams = useMemo(() => new SearchModel(), []);
 
-  const { data: incomes, loading } = useListManager(
-    IncomeService.searchEntities,
-    transformEntity,
-    searchParams
-  );
+  const {
+    data: incomes,
+    setSorting,
+    setSearch,
+  } = useListManager(IncomeService.searchEntities, transformEntity);
 
   const columns: TableProps<InvoiceTableDataType>['columns'] = [
     {
@@ -119,19 +84,37 @@ export const Incomes: React.FC = (): JSX.Element => {
     },
   ];
 
+  const items: MenuProps['items'] = [
+    {
+      label: t('asc'),
+      key: 'ASC',
+    },
+    {
+      label: t('desc'),
+      key: 'DESC',
+    },
+  ];
+
   const incomeCreateEditPopup = () => {
     // TODO
+  };
+
+  const onSortClick: MenuProps['onClick'] = ({ key }) => {
+    setSorting(key);
   };
 
   return (
     <div className={classes.container}>
       <div className={classes.filter}>
         <Space.Compact>
-          <Input placeholder={t('searchFor')} width={'auto'} />
+          <SearchInput
+            placeholder={t('searchFor')}
+            onSearch={(value) => setSearch(value)}
+          />
         </Space.Compact>
         <DatePicker placeholder={t('fromDate')} />
         <DatePicker placeholder={t('toDate')} />
-        <Dropdown menu={{ items }} trigger={['click']}>
+        <Dropdown menu={{ items, onClick: onSortClick }} trigger={['click']}>
           <Button>
             Sort <DownOutlined />
           </Button>

@@ -1,33 +1,7 @@
 export class SearchModel {
   criteriaQuick = '';
-  private betweenAttributes: BettweenAttribute[] = [];
-  ordering: 'ASC' | 'DESC' = 'ASC';
-
-  getBetweenAttributes(): BettweenAttribute[] {
-    return this.betweenAttributes;
-  }
-
-  addBetweenAttribute(newBetweenAttribute: BettweenAttribute): void {
-    const prevAttrIndex = this.betweenAttributes.findIndex(
-      (x) => x.attribute === newBetweenAttribute.attribute
-    );
-    prevAttrIndex < 0
-      ? this.betweenAttributes.push(newBetweenAttribute)
-      : (this.betweenAttributes[prevAttrIndex] = newBetweenAttribute);
-  }
-
-  clearAllBetweenAttributes(): void {
-    this.betweenAttributes = [];
-  }
-
-  removeBetweenAttribute(attr: string): void {
-    const prevAttrIndex = this.betweenAttributes.findIndex(
-      (x) => x.attribute === attr
-    );
-    if (prevAttrIndex >= 0) {
-      this.betweenAttributes.splice(prevAttrIndex, 1);
-    }
-  }
+  betweenAttributes: BettweenAttribute[] = [];
+  ordering = 'ASC';
 }
 
 export interface BettweenAttribute {
