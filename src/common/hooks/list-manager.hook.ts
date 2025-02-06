@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrayResponseI } from 'src/models/array-response.interface';
 import { BaseModel } from 'src/models/base-model';
 import { ResponseI } from 'src/models/response.models';
@@ -34,6 +34,7 @@ export function useListManager<T extends BaseModel, C extends BaseModel>(
   const [entities, setEntities] = useState<T[]>([]);
   const [data, setData] = useState<C[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [bottomReached, setBottomReached] = useState<boolean>(false);
   const [skip, setSkip] = useState<number>(0);
   const [top, setTop] = useState<number>(NUMBER_OF_ITEMS_ON_PAGE);
   const [searchModel, setSearchModel] = useState<SearchModel>(
@@ -101,18 +102,33 @@ export function useListManager<T extends BaseModel, C extends BaseModel>(
   };
 
   useEffect(() => {
+    if (bottomReached) {
+      return;
+    }
     setLoading(true);
     requestFunction(searchModel, skip, top)
       .then((res) => {
         return res.data;
       })
       .then((data) => {
-        setEntities((prev) => [...prev, ...data.entities]);
+        setEntities((prev) => {
+          const newEntities = [...prev, ...data.entities];
+          if (newEntities.length === data.totalCount) {
+            setBottomReached(true);
+          }
+          return newEntities;
+        });
         setData((prev) => [...prev, ...data.entities.map(transformFunction)]);
-        // data.entities.map(transformFunction));
       })
       .finally(() => setLoading(false));
-  }, [requestFunction, transformFunction, skip, top, searchModel]);
+  }, [
+    requestFunction,
+    transformFunction,
+    skip,
+    top,
+    searchModel,
+    bottomReached,
+  ]);
 
   return {
     entities,
