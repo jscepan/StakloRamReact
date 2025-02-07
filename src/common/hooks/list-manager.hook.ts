@@ -1,8 +1,98 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useReducer } from 'react';
 import { ArrayResponseI } from 'src/models/array-response.interface';
 import { BaseModel } from 'src/models/base-model';
 import { ResponseI } from 'src/models/response.models';
 import { BettweenAttribute, SearchModel } from 'src/models/search.model';
+
+enum ActionType {
+  SET_ENTITIES = 'SET_ENTITIES',
+  ADD_ENTITIES = 'ADD_ENTITIES',
+  SET_DATA = 'SET_DATA',
+  ADD_DATA = 'ADD_DATA',
+  SET_TOTAL_COUNT = 'SET_TOTAL_COUNT',
+  SET_LOADING = 'SET_LOADING',
+  SET_SKIP = 'SET_SKIP',
+  SET_TOP = 'SET_TOP',
+  SET_SEARCH_MODEL = 'SET_SEARCH_MODEL',
+  CLEAR_FILTERS = 'CLEAR_FILTERS',
+}
+
+type Action<T, C> =
+  | { type: ActionType.SET_ENTITIES; payload: T[] }
+  | { type: ActionType.ADD_ENTITIES; payload: T[] }
+  | { type: ActionType.SET_DATA; payload: C[] }
+  | { type: ActionType.ADD_DATA; payload: C[] }
+  | { type: ActionType.SET_TOTAL_COUNT; payload: number }
+  | { type: ActionType.SET_LOADING; payload: boolean }
+  | { type: ActionType.SET_SKIP; payload: number }
+  | { type: ActionType.SET_TOP; payload: number }
+  | { type: ActionType.SET_SEARCH_MODEL; payload: SearchModel }
+  | { type: ActionType.CLEAR_FILTERS };
+
+interface State<T, C> {
+  entities: T[];
+  data: C[];
+  totalCount: number;
+  length: number;
+  loading: boolean;
+  skip: number;
+  top: number;
+  searchModel: SearchModel;
+  bottomReached: boolean;
+}
+
+const initialState = <T, C>(): State<T, C> => ({
+  entities: [],
+  data: [],
+  totalCount: 0,
+  length: 0,
+  loading: true,
+  skip: 0,
+  top: 50,
+  searchModel: new SearchModel(),
+  bottomReached: false,
+});
+
+function listManagerReducer<T, C>(
+  state: State<T, C>,
+  action: Action<T, C>
+): State<T, C> {
+  switch (action.type) {
+    case ActionType.SET_ENTITIES:
+      return {
+        ...state,
+        entities: action.payload,
+        bottomReached: action.payload.length >= state.totalCount,
+        length: action.payload.length,
+      };
+    case ActionType.ADD_ENTITIES:
+      return {
+        ...state,
+        entities: [...state.entities, ...action.payload],
+        bottomReached:
+          state.entities.length + action.payload.length >= state.totalCount,
+        length: state.entities.length + action.payload.length,
+      };
+    case ActionType.SET_TOTAL_COUNT:
+      return { ...state, totalCount: action.payload };
+    case ActionType.SET_DATA:
+      return { ...state, data: action.payload };
+    case ActionType.ADD_DATA:
+      return { ...state, data: [...state.data, ...action.payload] };
+    case ActionType.SET_LOADING:
+      return { ...state, loading: action.payload };
+    case ActionType.SET_SKIP:
+      return { ...state, skip: action.payload };
+    case ActionType.SET_TOP:
+      return { ...state, top: action.payload };
+    case ActionType.SET_SEARCH_MODEL:
+      return { ...state, searchModel: action.payload };
+    case ActionType.CLEAR_FILTERS:
+      return initialState<T, C>();
+    default:
+      return state;
+  }
+}
 
 type RequestFunction<T> = (
   params: any,
@@ -12,12 +102,12 @@ type RequestFunction<T> = (
 type TransformFunction<T extends BaseModel, C extends BaseModel> = (
   item: T
 ) => C;
-const NUMBER_OF_ITEMS_ON_PAGE = 50;
 
 interface ListManagerReturn<T, C> {
   entities: T[];
   data: C[];
   length: number;
+  totalCount: number;
   loading: boolean;
   requestFirstPage: () => void;
   requestNextPage: () => void;
@@ -32,114 +122,106 @@ export function useListManager<T extends BaseModel, C extends BaseModel>(
   requestFunction: RequestFunction<T>,
   transformFunction: TransformFunction<T, C>
 ): ListManagerReturn<T, C> {
-  const [entities, setEntities] = useState<T[]>([]);
-  const [length, setLength] = useState<number>(0);
-  const [data, setData] = useState<C[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [bottomReached, setBottomReached] = useState<boolean>(false);
-  const [skip, setSkip] = useState<number>(0);
-  const [top, setTop] = useState<number>(NUMBER_OF_ITEMS_ON_PAGE);
-  const [searchModel, setSearchModel] = useState<SearchModel>(
-    new SearchModel()
+  const [state, dispatch] = useReducer(
+    listManagerReducer<T, C>,
+    initialState<T, C>()
   );
+  const {
+    entities,
+    data,
+    length,
+    totalCount,
+    loading,
+    bottomReached,
+    skip,
+    top,
+    searchModel,
+  } = state;
+  const resetState = <T, C>(dispatch: React.Dispatch<Action<T, C>>) => {
+    dispatch({ type: ActionType.SET_ENTITIES, payload: [] });
+    dispatch({ type: ActionType.SET_DATA, payload: [] });
+    dispatch({ type: ActionType.SET_SKIP, payload: 0 });
+  };
 
   const requestFirstPage = () => {
-    setEntities([]);
-    setData([]);
-    setSkip(0);
+    resetState(dispatch);
   };
 
   const requestNextPage = () => {
-    setSkip((prev) => prev + NUMBER_OF_ITEMS_ON_PAGE);
+    dispatch({ type: ActionType.SET_SKIP, payload: skip + 50 });
   };
 
   const setSorting = (sort: string) => {
-    setEntities([]);
-    setData([]);
-    setSearchModel((prev) => ({ ...prev, ordering: sort }));
+    resetState(dispatch);
+    dispatch({
+      type: ActionType.SET_SEARCH_MODEL,
+      payload: { ...searchModel, ordering: sort },
+    });
   };
 
   const setQuickSearch = (criteriaQuick: string) => {
-    console.log('1: ', criteriaQuick);
-    console.log('2: ', searchModel.criteriaQuick);
-    if (criteriaQuick === searchModel.criteriaQuick) {
-      return;
-    } else {
-      console.log('else');
-    }
-    setEntities([]);
-    setData([]);
-    setSkip(0);
-    setSearchModel((prev) => {
-      const newSearchModel: SearchModel = { ...prev, criteriaQuick };
-
-      return newSearchModel;
+    if (criteriaQuick === searchModel.criteriaQuick) return;
+    resetState(dispatch);
+    dispatch({
+      type: ActionType.SET_SEARCH_MODEL,
+      payload: { ...searchModel, criteriaQuick },
     });
   };
 
   const clearFilters = () => {
-    setSearchModel(new SearchModel());
-    setEntities([]);
-    setData([]);
-    setSkip(0);
-    setTop(50);
+    dispatch({ type: ActionType.CLEAR_FILTERS });
   };
 
   const addBetweenAttribute = (newBetweenAttribute: BettweenAttribute) => {
-    setEntities([]);
-    setData([]);
-    setSkip(0);
-    setSearchModel((prev) => {
-      const newSearchModel = { ...prev };
-      const prevAttrIndex = newSearchModel.betweenAttributes.findIndex(
-        (x) => x.attribute === newBetweenAttribute.attribute
-      );
-      prevAttrIndex < 0
-        ? newSearchModel.betweenAttributes.push(newBetweenAttribute)
-        : (newSearchModel.betweenAttributes[prevAttrIndex] =
-            newBetweenAttribute);
-
-      return newSearchModel;
+    resetState(dispatch);
+    dispatch({
+      type: ActionType.SET_SEARCH_MODEL,
+      payload: {
+        ...searchModel,
+        betweenAttributes: [
+          ...searchModel.betweenAttributes,
+          newBetweenAttribute,
+        ],
+      },
     });
   };
 
   const removeBetweenAttribute = (attr: string) => {
-    setEntities([]);
-    setData([]);
-    setSkip(0);
-    setSearchModel((prev) => {
-      const newSearchModel = { ...prev };
-      const prevAttrIndex = newSearchModel.betweenAttributes.findIndex(
-        (x) => x.attribute === attr
-      );
-      if (prevAttrIndex >= 0) {
-        newSearchModel.betweenAttributes.splice(prevAttrIndex, 1);
-      }
-      return newSearchModel;
+    resetState(dispatch);
+    dispatch({
+      type: ActionType.SET_SEARCH_MODEL,
+      payload: {
+        ...searchModel,
+        betweenAttributes: searchModel.betweenAttributes.filter(
+          (item) => item.attribute !== attr
+        ),
+      },
     });
   };
 
   useEffect(() => {
-    if (bottomReached) {
-      return;
-    }
-    setLoading(true);
+    if (bottomReached) return;
+    dispatch({ type: ActionType.SET_LOADING, payload: true });
+
     requestFunction(searchModel, skip, top)
-      .then((res) => {
-        return res.data;
-      })
+      .then((res) => res.data)
       .then((data) => {
-        setEntities((prev) => {
-          const newEntities = [...prev, ...data.entities];
-          setLength(newEntities.length);
-          if (newEntities.length >= data.totalCount) {
-            setBottomReached(true);
-          }
-          return newEntities;
+        dispatch({
+          type: ActionType.SET_TOTAL_COUNT,
+          payload: data.totalCount,
         });
-        setData((prev) => [...prev, ...data.entities.map(transformFunction)]);
+        dispatch({
+          type: ActionType.ADD_ENTITIES,
+          payload: data.entities,
+        });
+        dispatch({
+          type: ActionType.ADD_DATA,
+          payload: [...data.entities.map(transformFunction)],
+        });
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        dispatch({ type: ActionType.SET_LOADING, payload: false });
+      });
   }, [
     requestFunction,
     transformFunction,
@@ -153,6 +235,7 @@ export function useListManager<T extends BaseModel, C extends BaseModel>(
     entities,
     data,
     length,
+    totalCount,
     loading,
     requestFirstPage,
     requestNextPage,
