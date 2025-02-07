@@ -53,12 +53,6 @@ export const Incomes: React.FC = (): JSX.Element => {
     addBetweenAttribute,
     removeBetweenAttribute,
   } = useListManager(IncomeService.searchEntities, transformEntity);
-  const onSearch = useCallback(
-    (value: string) => {
-      setQuickSearch(value);
-    },
-    [setQuickSearch]
-  );
 
   const setDate =
     (type: 'from' | 'to'): DatePickerProps['onChange'] =>
@@ -147,7 +141,7 @@ export const Incomes: React.FC = (): JSX.Element => {
           <SearchInput
             ref={searchInputRef}
             placeholder={t('searchFor')}
-            onSearch={(value) => onSearch(value)}
+            onSearch={(value) => setQuickSearch(value)}
           />
         </Space.Compact>
         <DatePicker

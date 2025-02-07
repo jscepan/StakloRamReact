@@ -95,7 +95,7 @@ function listManagerReducer<T, C>(
 }
 
 type RequestFunction<T> = (
-  params: any,
+  data: SearchModel,
   skip: number,
   top: number
 ) => Promise<ResponseI<ArrayResponseI<T>>>;

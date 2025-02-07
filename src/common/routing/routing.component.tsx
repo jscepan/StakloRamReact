@@ -37,7 +37,9 @@ export const RouteAuthGuard: React.FC<{ children: JSX.Element }> = ({
           authCtx?.setUser(userData);
           setLoading(false);
         })
-        .catch(() => setLoading(false));
+        .finally(() => {
+          setLoading(false);
+        });
     } else {
       setLoading(false);
     }

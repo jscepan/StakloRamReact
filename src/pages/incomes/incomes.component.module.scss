@@ -2,7 +2,6 @@
   display: flex;
   flex-direction: column;
   height: calc(100%);
-  //   width: 100%;
 
   .filter {
     display: flex;
@@ -15,11 +14,6 @@
     overflow: auto;
     .incomesTable {
       height: 100%;
-      thead {
-      }
-      tbody {
-        // overflow-y: scroll;
-      }
     }
   }
 }
