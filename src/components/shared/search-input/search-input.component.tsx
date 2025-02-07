@@ -1,11 +1,21 @@
 import { CloseOutlined } from '@ant-design/icons';
 import { Input } from 'antd';
-import { JSX, useEffect, useImperativeHandle, useState } from 'react';
+import {
+  ForwardedRef,
+  JSX,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from 'react';
 
 interface SearchInputProps {
   placeholder?: string;
   onSearch: (value: string) => void;
-  ref: any;
+  ref: ForwardedRef<SearchInputRef>;
+}
+
+export interface SearchInputRef {
+  clearSearch: () => void;
 }
 
 export const SearchInput: React.FC<SearchInputProps> = ({
@@ -20,6 +30,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 
     const handler = setTimeout(() => {
       if (searchText?.length >= 3 || searchText === '') {
+        console.log('uradi search za: ' + searchText);
         onSearch(searchText);
       }
     }, 500);

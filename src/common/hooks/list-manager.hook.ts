@@ -17,6 +17,7 @@ const NUMBER_OF_ITEMS_ON_PAGE = 50;
 interface ListManagerReturn<T, C> {
   entities: T[];
   data: C[];
+  length: number;
   loading: boolean;
   requestFirstPage: () => void;
   requestNextPage: () => void;
@@ -32,6 +33,7 @@ export function useListManager<T extends BaseModel, C extends BaseModel>(
   transformFunction: TransformFunction<T, C>
 ): ListManagerReturn<T, C> {
   const [entities, setEntities] = useState<T[]>([]);
+  const [length, setLength] = useState<number>(0);
   const [data, setData] = useState<C[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [bottomReached, setBottomReached] = useState<boolean>(false);
@@ -58,23 +60,23 @@ export function useListManager<T extends BaseModel, C extends BaseModel>(
   };
 
   const setQuickSearch = (criteriaQuick: string) => {
-    console.log(criteriaQuick);
+    console.log('1: ', criteriaQuick);
+    console.log('2: ', searchModel.criteriaQuick);
+    if (criteriaQuick === searchModel.criteriaQuick) {
+      return;
+    } else {
+      console.log('else');
+    }
+    setEntities([]);
+    setData([]);
+    setSkip(0);
+    setSearchModel((prev) => {
+      const newSearchModel: SearchModel = { ...prev, criteriaQuick };
+
+      return newSearchModel;
+    });
   };
-  //   const setSearch = useCallback(
-  //     (criteriaQuick: string) => {
-  //       setEntities([]);
-  //       setData([]);
-  //       setSearchModel((prev) => {
-  //         console.log('1');
-  //         if (prev.criteriaQuick === criteriaQuick) {
-  //           console.log('xxx');
-  //           return prev;
-  //         }
-  //         return { ...prev, criteriaQuick };
-  //       });
-  //     },
-  //     [setSearchModel]
-  //   );
+
   const clearFilters = () => {
     setSearchModel(new SearchModel());
     setEntities([]);
@@ -84,21 +86,37 @@ export function useListManager<T extends BaseModel, C extends BaseModel>(
   };
 
   const addBetweenAttribute = (newBetweenAttribute: BettweenAttribute) => {
-    const prevAttrIndex = searchModel.betweenAttributes.findIndex(
-      (x) => x.attribute === newBetweenAttribute.attribute
-    );
-    prevAttrIndex < 0
-      ? searchModel.betweenAttributes.push(newBetweenAttribute)
-      : (searchModel.betweenAttributes[prevAttrIndex] = newBetweenAttribute);
+    setEntities([]);
+    setData([]);
+    setSkip(0);
+    setSearchModel((prev) => {
+      const newSearchModel = { ...prev };
+      const prevAttrIndex = newSearchModel.betweenAttributes.findIndex(
+        (x) => x.attribute === newBetweenAttribute.attribute
+      );
+      prevAttrIndex < 0
+        ? newSearchModel.betweenAttributes.push(newBetweenAttribute)
+        : (newSearchModel.betweenAttributes[prevAttrIndex] =
+            newBetweenAttribute);
+
+      return newSearchModel;
+    });
   };
 
   const removeBetweenAttribute = (attr: string) => {
-    const prevAttrIndex = searchModel.betweenAttributes.findIndex(
-      (x) => x.attribute === attr
-    );
-    if (prevAttrIndex >= 0) {
-      searchModel.betweenAttributes.splice(prevAttrIndex, 1);
-    }
+    setEntities([]);
+    setData([]);
+    setSkip(0);
+    setSearchModel((prev) => {
+      const newSearchModel = { ...prev };
+      const prevAttrIndex = newSearchModel.betweenAttributes.findIndex(
+        (x) => x.attribute === attr
+      );
+      if (prevAttrIndex >= 0) {
+        newSearchModel.betweenAttributes.splice(prevAttrIndex, 1);
+      }
+      return newSearchModel;
+    });
   };
 
   useEffect(() => {
@@ -113,7 +131,8 @@ export function useListManager<T extends BaseModel, C extends BaseModel>(
       .then((data) => {
         setEntities((prev) => {
           const newEntities = [...prev, ...data.entities];
-          if (newEntities.length === data.totalCount) {
+          setLength(newEntities.length);
+          if (newEntities.length >= data.totalCount) {
             setBottomReached(true);
           }
           return newEntities;
@@ -133,6 +152,7 @@ export function useListManager<T extends BaseModel, C extends BaseModel>(
   return {
     entities,
     data,
+    length,
     loading,
     requestFirstPage,
     requestNextPage,

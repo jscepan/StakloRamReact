@@ -1,8 +1,9 @@
-import React, { JSX, useRef } from 'react';
+import React, { JSX, useCallback, useRef } from 'react';
 import classes from './incomes.component.module.scss';
 import {
   Button,
   DatePicker,
+  DatePickerProps,
   Dropdown,
   MenuProps,
   Space,
@@ -17,6 +18,7 @@ import { DownOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { SearchInput } from 'src/components/shared/search-input/search-input.component';
 import { useInfiniteScroll } from 'src/common/hooks/infinite-scroll.hook';
+import { BettweenAttribute } from 'src/models/search.model';
 
 interface InvoiceTableDataType {
   key: string;
@@ -48,7 +50,37 @@ export const Incomes: React.FC = (): JSX.Element => {
     setSorting,
     setQuickSearch,
     requestNextPage,
+    addBetweenAttribute,
+    removeBetweenAttribute,
   } = useListManager(IncomeService.searchEntities, transformEntity);
+  const onSearch = useCallback(
+    (value: string) => {
+      setQuickSearch(value);
+    },
+    [setQuickSearch]
+  );
+
+  const setDate =
+    (type: 'from' | 'to'): DatePickerProps['onChange'] =>
+    (date, dateString) => {
+      console.log(dateString);
+
+      if (dateString) {
+        const newBetweenAttribute: BettweenAttribute = {
+          attribute: type === 'from' ? 'from_date' : 'to_date',
+          attributeValue: dateString as string,
+          attributeType: 'DATE',
+          type: type === 'from' ? 'GREATER_OR_EQUAL' : 'SMALLER_OR_EQUAL',
+        };
+        console.log(newBetweenAttribute);
+
+        addBetweenAttribute(newBetweenAttribute);
+      } else if (type === 'from') {
+        removeBetweenAttribute('from_date');
+      } else if (type === 'to') {
+        removeBetweenAttribute('to_date');
+      }
+    };
 
   const columns: TableProps<InvoiceTableDataType>['columns'] = [
     {
@@ -115,11 +147,19 @@ export const Incomes: React.FC = (): JSX.Element => {
           <SearchInput
             ref={searchInputRef}
             placeholder={t('searchFor')}
-            onSearch={(value) => setQuickSearch(value)}
+            onSearch={(value) => onSearch(value)}
           />
         </Space.Compact>
-        <DatePicker placeholder={t('fromDate')} />
-        <DatePicker placeholder={t('toDate')} />
+        <DatePicker
+          placeholder={t('fromDate')}
+          type="date"
+          onChange={setDate('from')}
+        />
+        <DatePicker
+          placeholder={t('toDate')}
+          type="date"
+          onChange={setDate('to')}
+        />
         <Dropdown menu={{ items, onClick: onSortClick }} trigger={['click']}>
           <Button>
             Sort <DownOutlined />
