@@ -10,7 +10,7 @@ import {
   Select,
 } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { PlusOutlined } from '@ant-design/icons';
+import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { IncomeModel } from 'src/models/income.model';
 import { BuyerModel } from 'src/models/buyer.model';
 import { IncomeService } from 'src/services/income.service';
@@ -18,7 +18,8 @@ import { BuyerService } from 'src/services/buyer.service';
 import { useListManager } from 'src/common/hooks/list-manager.hook';
 
 interface CreateFormPropsI {
-  incomeCreateFn: (income: IncomeModel) => void;
+  incomeCreateEditFn: (income: IncomeModel) => void;
+  oid?: string;
 }
 
 const transformEntity = (
@@ -56,7 +57,7 @@ export const IncomeCreateEdit: React.FC<CreateFormPropsI> = (
       .then((data) => {
         setLoadingCreateEdit(false);
         setOpen(false);
-        props.incomeCreateFn(data);
+        props.incomeCreateEditFn(data);
       });
   };
 
@@ -72,9 +73,12 @@ export const IncomeCreateEdit: React.FC<CreateFormPropsI> = (
 
   return (
     <>
-      <Button type="primary" onClick={showModal} icon={<PlusOutlined />}>
-        {t('createIncome')}
-      </Button>
+      {!props.oid && (
+        <Button type="primary" onClick={showModal} icon={<PlusOutlined />}>
+          {t('createIncome')}
+        </Button>
+      )}
+      {props.oid && <Button onClick={showModal} icon={<EditOutlined />} />}
       <Modal
         open={open}
         title={t('createIncome')}

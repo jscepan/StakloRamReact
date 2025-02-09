@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { IncomeService } from 'src/services/income.service';
 import { useListManager } from 'src/common/hooks/list-manager.hook';
 import { IncomeModel } from 'src/models/income.model';
-import { DownOutlined } from '@ant-design/icons';
+import { DeleteOutlined, DownOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { SearchInput } from 'src/components/shared/search-input/search-input.component';
 import { useInfiniteScroll } from 'src/common/hooks/infinite-scroll.hook';
@@ -102,11 +102,18 @@ export const Incomes: React.FC = (): JSX.Element => {
     },
     {
       title: t('edit'),
-      key: 'action',
+      key: 'edit',
+      render: (record) => (
+        <IncomeCreateEdit
+          incomeCreateEditFn={requestFirstPage}
+          oid={record.oid}
+        />
+      ),
     },
     {
       title: t('delete'),
       key: 'action',
+      render: () => <Button icon={<DeleteOutlined />} />,
     },
   ];
 
@@ -160,7 +167,7 @@ export const Incomes: React.FC = (): JSX.Element => {
         >
           {t('outcomes')}
         </Button>
-        <IncomeCreateEdit incomeCreateFn={requestFirstPage} />
+        <IncomeCreateEdit incomeCreateEditFn={requestFirstPage} />
       </div>
       <div className={classes.incomes} ref={containerRef}>
         <Table<InvoiceTableDataType>
