@@ -1,4 +1,4 @@
-import React, { JSX, useCallback, useRef } from 'react';
+import React, { JSX, useRef } from 'react';
 import classes from './incomes.component.module.scss';
 import {
   Button,
@@ -47,10 +47,11 @@ export const Incomes: React.FC = (): JSX.Element => {
 
   const {
     data: incomes,
-    loading,
+    isLoading: loading,
     setSorting,
     setQuickSearch,
     requestNextPage,
+    requestFirstPage,
     addBetweenAttribute,
     removeBetweenAttribute,
   } = useListManager(IncomeService.searchEntities, transformEntity);
@@ -120,10 +121,6 @@ export const Incomes: React.FC = (): JSX.Element => {
     },
   ];
 
-  const incomeCreateEditPopup = () => {
-    // TODO
-  };
-
   const onSortClick: MenuProps['onClick'] = ({ key }) => {
     setSorting(key);
   };
@@ -163,7 +160,7 @@ export const Incomes: React.FC = (): JSX.Element => {
         >
           {t('outcomes')}
         </Button>
-        <IncomeCreateEdit />
+        <IncomeCreateEdit incomeCreateFn={requestFirstPage} />
       </div>
       <div className={classes.incomes} ref={containerRef}>
         <Table<InvoiceTableDataType>

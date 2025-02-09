@@ -12,7 +12,6 @@ export const Login: React.FC = (): JSX.Element => {
     AuthenticationService.login(data)
       .then((res) => res?.data)
       .then((data) => {
-        console.log(data);
         LocalStorageService.set('jwt', `Bearer ${data.jwt}`);
         navigate('/');
       });

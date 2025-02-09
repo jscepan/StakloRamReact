@@ -34,7 +34,7 @@ interface State<T, C> {
   data: C[];
   totalCount: number;
   length: number;
-  loading: boolean;
+  isLoading: boolean;
   skip: number;
   top: number;
   searchModel: SearchModel;
@@ -46,7 +46,7 @@ const initialState = <T, C>(): State<T, C> => ({
   data: [],
   totalCount: 0,
   length: 0,
-  loading: true,
+  isLoading: true,
   skip: 0,
   top: 50,
   searchModel: new SearchModel(),
@@ -80,7 +80,7 @@ function listManagerReducer<T, C>(
     case ActionType.ADD_DATA:
       return { ...state, data: [...state.data, ...action.payload] };
     case ActionType.SET_LOADING:
-      return { ...state, loading: action.payload };
+      return { ...state, isLoading: action.payload };
     case ActionType.SET_SKIP:
       return { ...state, skip: action.payload };
     case ActionType.SET_TOP:
@@ -108,7 +108,8 @@ interface ListManagerReturn<T, C> {
   data: C[];
   length: number;
   totalCount: number;
-  loading: boolean;
+  isLoading: boolean;
+  getEntity: (oid: string) => T;
   requestFirstPage: () => void;
   requestNextPage: () => void;
   setSorting: (ordering: string) => void;
@@ -131,7 +132,7 @@ export function useListManager<T extends BaseModel, C extends BaseModel>(
     data,
     length,
     totalCount,
-    loading,
+    isLoading,
     bottomReached,
     skip,
     top,
@@ -199,6 +200,10 @@ export function useListManager<T extends BaseModel, C extends BaseModel>(
     });
   };
 
+  const getEntity = (oid: string) => {
+    return entities.filter((e) => e.oid === oid)[0];
+  };
+
   useEffect(() => {
     if (bottomReached || length > skip) return;
     dispatch({ type: ActionType.SET_LOADING, payload: true });
@@ -237,7 +242,8 @@ export function useListManager<T extends BaseModel, C extends BaseModel>(
     data,
     length,
     totalCount,
-    loading,
+    isLoading,
+    getEntity,
     requestFirstPage,
     requestNextPage,
     setSorting,
