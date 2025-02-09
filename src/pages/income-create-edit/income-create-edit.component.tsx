@@ -25,8 +25,8 @@ const transformEntity = (
   entity: BuyerModel
 ): { oid: string; label: string; value: string } => ({
   oid: entity.oid,
-  label: entity.name,
   value: entity.oid,
+  label: entity.name,
 });
 
 export const IncomeCreateEdit: React.FC<CreateFormPropsI> = (
@@ -46,7 +46,7 @@ export const IncomeCreateEdit: React.FC<CreateFormPropsI> = (
     const payload = {
       ...values,
       date: values.date ? values.date.format('YYYY-MM-DD') : null,
-      buyer: values.buyer?.oid,
+      buyer: getEntity(values.buyer),
     };
     setLoadingCreateEdit(true);
     IncomeService.createEntity(payload)
@@ -55,6 +55,7 @@ export const IncomeCreateEdit: React.FC<CreateFormPropsI> = (
       })
       .then((data) => {
         setLoadingCreateEdit(false);
+        setOpen(false);
         props.incomeCreateFn(data);
       });
   };
@@ -100,9 +101,6 @@ export const IncomeCreateEdit: React.FC<CreateFormPropsI> = (
               onSearch={(searchText) => setQuickSearch(searchText)}
               placeholder={t('buyer')}
               options={buyers}
-              onChange={(value) => {
-                form.setFieldsValue({ buyer: getEntity(value) });
-              }}
             ></Select>
           </Form.Item>
           <Form.Item
