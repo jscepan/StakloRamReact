@@ -19,6 +19,7 @@ import { useNavigate } from 'react-router-dom';
 import { SearchInput } from 'src/components/shared/search-input/search-input.component';
 import { useInfiniteScroll } from 'src/common/hooks/infinite-scroll.hook';
 import { BettweenAttribute } from 'src/models/search.model';
+import { IncomeCreateEdit } from '../income-create-edit/income-create-edit.component';
 
 interface InvoiceTableDataType {
   key: string;
@@ -57,8 +58,6 @@ export const Incomes: React.FC = (): JSX.Element => {
   const setDate =
     (type: 'from' | 'to'): DatePickerProps['onChange'] =>
     (date, dateString) => {
-      console.log(dateString);
-
       if (dateString) {
         const newBetweenAttribute: BettweenAttribute = {
           attribute: type === 'from' ? 'from_date' : 'to_date',
@@ -66,8 +65,6 @@ export const Incomes: React.FC = (): JSX.Element => {
           attributeType: 'DATE',
           type: type === 'from' ? 'GREATER_OR_EQUAL' : 'SMALLER_OR_EQUAL',
         };
-        console.log(newBetweenAttribute);
-
         addBetweenAttribute(newBetweenAttribute);
       } else if (type === 'from') {
         removeBetweenAttribute('from_date');
@@ -166,7 +163,7 @@ export const Incomes: React.FC = (): JSX.Element => {
         >
           {t('outcomes')}
         </Button>
-        <Button onClick={incomeCreateEditPopup}>{t('createIncome')}</Button>
+        <IncomeCreateEdit />
       </div>
       <div className={classes.incomes} ref={containerRef}>
         <Table<InvoiceTableDataType>

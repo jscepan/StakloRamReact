@@ -200,7 +200,7 @@ export function useListManager<T extends BaseModel, C extends BaseModel>(
   };
 
   useEffect(() => {
-    if (bottomReached) return;
+    if (bottomReached || length > skip) return;
     dispatch({ type: ActionType.SET_LOADING, payload: true });
 
     requestFunction(searchModel, skip, top)
@@ -229,6 +229,7 @@ export function useListManager<T extends BaseModel, C extends BaseModel>(
     top,
     searchModel,
     bottomReached,
+    length,
   ]);
 
   return {
