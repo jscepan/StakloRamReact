@@ -1,4 +1,4 @@
-import React, { JSX, useRef } from 'react';
+import React, { JSX, useContext, useEffect, useRef } from 'react';
 import classes from './incomes.component.module.scss';
 import {
   Button,
@@ -20,6 +20,7 @@ import { SearchInput } from 'src/components/shared/search-input/search-input.com
 import { useInfiniteScroll } from 'src/common/hooks/infinite-scroll.hook';
 import { BettweenAttribute } from 'src/models/search.model';
 import { IncomeCreateEdit } from '../income-create-edit/income-create-edit.component';
+import { LoaderContext } from 'src/common/providers/loading-context.provider';
 
 interface InvoiceTableDataType {
   key: string;
@@ -44,6 +45,7 @@ const transformEntity = (entity: IncomeModel): InvoiceTableDataType => ({
 export const Incomes: React.FC = (): JSX.Element => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const loadingCtx = useContext(LoaderContext);
 
   const {
     data: incomes,
@@ -55,6 +57,14 @@ export const Incomes: React.FC = (): JSX.Element => {
     addBetweenAttribute,
     removeBetweenAttribute,
   } = useListManager(IncomeService.searchEntities, transformEntity);
+
+  useEffect(() => {
+    if (loading) {
+      loadingCtx?.showLoader();
+    } else {
+      loadingCtx?.hideLoader();
+    }
+  }, [loading, loadingCtx]);
 
   const setDate =
     (type: 'from' | 'to'): DatePickerProps['onChange'] =>

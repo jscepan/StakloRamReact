@@ -6,6 +6,7 @@ import classes from './app.module.scss';
 import './common/i18n';
 import { AuthContextProvider } from './common/providers/auth-context.provider';
 import { Routing } from './common/routing/routing.component';
+import { LoaderContextProvider } from './common/providers/loading-context.provider';
 
 export function App() {
   return (
@@ -13,7 +14,9 @@ export function App() {
       <ToastContainer />
       <div className={classes.aplication_wrapper}>
         <AuthContextProvider>
-          <Routing></Routing>
+          <LoaderContextProvider>
+            <Routing></Routing>
+          </LoaderContextProvider>
         </AuthContextProvider>
       </div>
     </>

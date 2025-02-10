@@ -20,6 +20,7 @@ import { Users } from 'src/pages/users/users.component';
 import { Views } from 'src/pages/views/views.component';
 import { Settings } from 'src/pages/settings/settings.component';
 import { PasswordReset } from 'src/pages/password-reset/password-reset.component';
+import { LoaderContext } from '../providers/loading-context.provider';
 
 export const RouteAuthGuard: React.FC<{ children: JSX.Element }> = ({
   children,
@@ -27,9 +28,11 @@ export const RouteAuthGuard: React.FC<{ children: JSX.Element }> = ({
   const authCtx = useContext(AuthContext);
   const [user, setUser] = useState<UserModel | null>(authCtx?.user || null);
   const [loading, setLoading] = useState<boolean>(true);
+  const loadingCtx = useContext(LoaderContext);
 
   useEffect(() => {
     if (!user && !authCtx?.user) {
+      loadingCtx?.showLoader();
       UserService.getCurrentUserProfile()
         .then((res) => res.data)
         .then((userData) => {
@@ -39,14 +42,15 @@ export const RouteAuthGuard: React.FC<{ children: JSX.Element }> = ({
         })
         .finally(() => {
           setLoading(false);
+          loadingCtx?.hideLoader();
         });
     } else {
       setLoading(false);
     }
-  }, [user, authCtx]);
+  }, [user, authCtx, loadingCtx]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div></div>;
   }
   if (!user) {
     return <Navigate to="/auth/login" />;
