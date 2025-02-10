@@ -7,17 +7,20 @@ import './common/i18n';
 import { AuthContextProvider } from './common/providers/auth-context.provider';
 import { Routing } from './common/routing/routing.component';
 import { LoaderContextProvider } from './common/providers/loading-context.provider';
+import { ModalContextProvider } from './common/providers/modal-context.provider';
 
 export function App() {
   return (
     <>
       <ToastContainer />
       <div className={classes.aplication_wrapper}>
-        <AuthContextProvider>
+        <ModalContextProvider>
           <LoaderContextProvider>
-            <Routing></Routing>
+            <AuthContextProvider>
+              <Routing></Routing>
+            </AuthContextProvider>
           </LoaderContextProvider>
-        </AuthContextProvider>
+        </ModalContextProvider>
       </div>
     </>
   );

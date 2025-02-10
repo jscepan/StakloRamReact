@@ -14,13 +14,19 @@ import { useTranslation } from 'react-i18next';
 import { IncomeService } from 'src/services/income.service';
 import { useListManager } from 'src/common/hooks/list-manager.hook';
 import { IncomeModel } from 'src/models/income.model';
-import { DeleteOutlined, DownOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  DownOutlined,
+  EditOutlined,
+  PlusOutlined,
+} from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { SearchInput } from 'src/components/shared/search-input/search-input.component';
 import { useInfiniteScroll } from 'src/common/hooks/infinite-scroll.hook';
 import { BettweenAttribute } from 'src/models/search.model';
 import { IncomeCreateEdit } from '../income-create-edit/income-create-edit.component';
 import { LoaderContext } from 'src/common/providers/loading-context.provider';
+import { ModalContext } from 'src/common/providers/modal-context.provider';
 
 interface InvoiceTableDataType {
   key: string;
@@ -46,6 +52,7 @@ export const Incomes: React.FC = (): JSX.Element => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const loadingCtx = useContext(LoaderContext);
+  const modalCtx = useContext(ModalContext);
 
   const {
     data: incomes,
@@ -114,9 +121,9 @@ export const Incomes: React.FC = (): JSX.Element => {
       title: t('edit'),
       key: 'edit',
       render: (record) => (
-        <IncomeCreateEdit
-          incomeCreateEditFn={requestFirstPage}
-          oid={record.oid}
+        <Button
+          onClick={() => openCreateEditPopup(record.oid)}
+          icon={<EditOutlined />}
         />
       ),
     },
@@ -126,6 +133,16 @@ export const Incomes: React.FC = (): JSX.Element => {
       render: () => <Button icon={<DeleteOutlined />} />,
     },
   ];
+
+  const openCreateEditPopup = async (oid?: string) => {
+    console.log(oid);
+    try {
+      const result = await modalCtx?.open(IncomeCreateEdit, { oid });
+      console.log('Rezultat:', result); // Obrađujemo podatke koje je modal vratio
+    } catch {
+      console.log('Modal zatvoren bez rezultata');
+    }
+  };
 
   const items: MenuProps['items'] = [
     {
@@ -177,7 +194,15 @@ export const Incomes: React.FC = (): JSX.Element => {
         >
           {t('outcomes')}
         </Button>
-        <IncomeCreateEdit incomeCreateEditFn={requestFirstPage} />
+        <Button
+          type="primary"
+          onClick={() => openCreateEditPopup()}
+          icon={<PlusOutlined />}
+        >
+          {t('createIncome')}
+        </Button>
+
+        {/* <IncomeCreateEdit incomeCreateEditFn={requestFirstPage} /> */}
       </div>
       <div className={classes.incomes} ref={containerRef}>
         <Table<InvoiceTableDataType>
